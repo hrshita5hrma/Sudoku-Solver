@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Solver</title>
+    <style>
+        table { border-collapse: collapse; margin: 20px auto; }
+        td { width: 40px; height: 40px; text-align: center; font-size: 20px; border: 1px solid black; }
+        input { width: 35px; height: 35px; font-size: 20px; text-align: center; border: none; }
+        button { display: block; margin: 10px auto; padding: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">Sudoku Solver</h1>
+    
+    <table id="sudoku-board"></table>
+    <button onclick="solveSudoku()">Solve Sudoku</button>
+
+    <script>
+        function createBoard() {
+            let table = document.getElementById("sudoku-board");
+            table.innerHTML = "";
+
+            for (let i = 0; i < 9; i++) {
+                let row = table.insertRow();
+                for (let j = 0; j < 9; j++) {
+                    let cell = row.insertCell();
+                    let input = document.createElement("input");
+                    input.type = "text";
+                    input.maxLength = 1;
+                    input.value = "";
+                    cell.appendChild(input);
+                }
+            }
+        }
+
+        async function solveSudoku() {
+            let board = [];
+            let table = document.getElementById("sudoku-board");
+
+            for (let i = 0; i < 9; i++) {
+                let row = [];
+                for (let j = 0; j < 9; j++) {
+                    let value = table.rows[i].cells[j].querySelector("input").value;
+                    row.push(value === "" ? "." : value);
+                }
+                board.push(row);
+            }
+
+            try {
+                console.log("Sending request to backend:", JSON.stringify(board)); // Debugging
+
+                let response = await fetch("http://localhost:8080/sudoku/solve", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(board)
+                });
+
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+
+                let solvedBoard = await response.json();
+                console.log("Response from backend:", solvedBoard); // Debugging
+
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        table.rows[i].cells[j].querySelector("input").value = solvedBoard[i][j];
+                    }
+                }
+            } catch (error) {
+                console.error("Error solving Sudoku:", error);
+                alert("Failed to solve Sudoku. Check console for details.");
+            }
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
