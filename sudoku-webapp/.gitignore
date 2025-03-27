@@ -1,0 +1,17 @@
+# Ignore system files
+AppData/
+*.log
+*.dat
+*.ini
+*.class
+ntuser.*
+
+# Ignore VS Code extensions
+.vscode/
+
+# Ignore SSH keys
+.ssh/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
